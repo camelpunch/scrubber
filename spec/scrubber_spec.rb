@@ -1,49 +1,10 @@
-module Scrubber
-  class List
-    include Enumerable
-
-    def initialize(items)
-      @items = items
-    end
-
-    def shuffle(seed)
-      List.new(@items.shuffle(random: Random.new(seed)))
-    end
-
-    def sort_by_previous_run(run_output)
-      sorted = []
-      run_output.each_line do |stored_line|
-        sorted << find {|item| stored_line.strip == id_for(item)}
-      end
-      List.new(sorted)
-    end
-
-    def each(&block)
-      @items.each(&block)
-    end
-
-    def to_s
-      inject(StringIO.new) {|output, item|
-        output.tap do |output|
-          output.puts id_for(item)
-        end
-      }.string
-    end
-
-    private
-
-    def id_for(item)
-      case item
-      when RSpec::Core::Example
-        "#{item.class} - #{item.full_description} - #{item.location}"
-      else
-        "#{item} - #{item.description} - #{item.file_path}"
-      end
-    end
-  end
-end
+require_relative '../lib/scrubber'
 
 describe Scrubber::List do
+  it "is empty when instantiated without arguments" do
+    expect(Scrubber::List.new).to be_empty
+  end
+
   it "can return a copy of itself with randomly ordered items" do
     items = [
       top_level1 = RSpec::Core::ExampleGroup.describe("Item 1"),
@@ -76,12 +37,12 @@ describe Scrubber::List do
       list = Scrubber::List.new(items)
       shuffled = list.shuffle(567)
 
-      shuffled_by_previous_run = list.sort_by_previous_run(shuffled.to_s)
+      shuffled_by_previous_run = list.sort_by_other(shuffled)
 
       expect(shuffled_by_previous_run.to_a).to eq(shuffled.to_a)
     end
 
-    it "excludes lines not in the provided document" do
+    it "accepts an edited string version of a previous run and removes deleted items" do
       items = [
         item1 = RSpec::Core::ExampleGroup.describe("Item 1"),
         item2 = RSpec::Core::ExampleGroup.describe("Item 2"),
@@ -93,9 +54,24 @@ describe Scrubber::List do
 
       edited = list.to_s.lines[1..2].join
 
-      expect(list.sort_by_previous_run(edited).to_a).to eq(
+      expect(list.sort_by_other(edited).to_a).to eq(
         [ item2, item3 ]
       )
+    end
+
+    it "copes with blank lines in a supplied string" do
+      items = [
+        item1 = RSpec::Core::ExampleGroup.describe("Item 1"),
+        item2 = RSpec::Core::ExampleGroup.describe("Item 2"),
+        item3 = RSpec::Core::ExampleGroup.describe("Item 3"),
+        item4 = RSpec::Core::ExampleGroup.describe("Item 4"),
+      ]
+
+      list = Scrubber::List.new(items)
+
+      edited = "\n\n\n"
+
+      expect(list.sort_by_other(edited).to_a).to be_empty
     end
   end
 
