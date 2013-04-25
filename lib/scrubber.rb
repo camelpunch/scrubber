@@ -1,4 +1,15 @@
 module Scrubber
+  class << self
+    def record_rspec_run(config, record_path)
+      FileUtils.rm_f(record_path)
+      config.order_groups_and_examples do |items|
+        List.new(items).shuffle(config.seed).tap do |list|
+          File.open(record_path, 'a') { |f| f.puts list }
+        end
+      end
+    end
+  end
+
   class List
     include Enumerable
 
