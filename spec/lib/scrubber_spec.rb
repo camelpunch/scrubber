@@ -1,4 +1,4 @@
-require_relative '../lib/scrubber'
+require_relative '../../lib/scrubber'
 
 describe Scrubber::List do
   it "is empty when instantiated without arguments" do
@@ -17,10 +17,10 @@ describe Scrubber::List do
 
     expect(shuffled).not_to equal(list)
     expect(shuffled.to_a).to eq(
-      [ top_level2, top_level3, top_level1 ]
-    )
-    expect(shuffled.shuffle(322).to_a).to eq(
       [ top_level1, top_level3, top_level2 ]
+    )
+    expect(shuffled.shuffle(922).to_a).to eq(
+      [ top_level2, top_level3, top_level1 ]
     )
   end
 
@@ -52,7 +52,7 @@ describe Scrubber::List do
 
       list = Scrubber::List.new(items)
 
-      edited = list.to_s.lines[1..2].join
+      edited = list.to_s.lines.to_a[1..2].join
 
       expect(list.sort_by_other(edited).to_a).to eq(
         [ item2, item3 ]
@@ -85,13 +85,13 @@ describe Scrubber::List do
 
     list = Scrubber::List.new(items)
 
-    lines = list.to_s.lines
+    lines = list.to_s.lines.to_a
     num = subclass_number(group1)
 
-    expect(lines[0]).to eq("RSpec::Core::ExampleGroup::Nested_#{num} - Group 1 - ./spec/scrubber_spec.rb\n")
-    expect(lines[1]).to match(%r{RSpec::Core::Example - Group 1 an example - ./spec/scrubber_spec.rb:\d+\n})
-    expect(lines[2]).to eq("RSpec::Core::ExampleGroup::Nested_#{num+1} - Group 2 - ./spec/scrubber_spec.rb\n")
-    expect(lines[3]).to eq("RSpec::Core::ExampleGroup::Nested_#{num+1}::Nested_1 - Subgroup - ./spec/scrubber_spec.rb\n")
+    expect(lines[0]).to eq("RSpec::Core::ExampleGroup::Nested_#{num} - Group 1 - ./spec/lib/scrubber_spec.rb\n")
+    expect(lines[1]).to match(%r{RSpec::Core::Example - Group 1 an example - ./spec/lib/scrubber_spec.rb:\d+\n})
+    expect(lines[2]).to eq("RSpec::Core::ExampleGroup::Nested_#{num+1} - Group 2 - ./spec/lib/scrubber_spec.rb\n")
+    expect(lines[3]).to eq("RSpec::Core::ExampleGroup::Nested_#{num+1}::Nested_1 - Subgroup - ./spec/lib/scrubber_spec.rb\n")
   end
 
   def subclass_number(example_group)

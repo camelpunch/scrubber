@@ -15,7 +15,8 @@ module Scrubber
     end
 
     def shuffle(seed)
-      List.new(@items.shuffle(random: Random.new(seed)))
+      generator = Random.new(seed)
+      List.new(@items.sort_by { generator.rand(@items.size) })
     end
 
     def sort_by_other(run)
