@@ -8,6 +8,12 @@ module Scrubber
         end
       end
     end
+
+    def play_rspec_run(config, record_path)
+      config.order_groups_and_examples do |items|
+        List.new(items).sort_by_other(File.read(record_path))
+      end
+    end
   end
 
   class List

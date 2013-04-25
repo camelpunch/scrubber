@@ -50,7 +50,36 @@ describe Scrubber do
   end
 
   describe "playing back an RSpec run" do
-    it "returns items from the config block in the file's order"
+    it "returns items from the config block in the file's order" do
+      config = stub('rspec config', seed: 123)
+      ordering_block = nil
+      config.define_singleton_method(:order_groups_and_examples) do |&block|
+        ordering_block = block
+      end
+
+      items = [
+        group1 = RSpec::Core::ExampleGroup.describe("Item 1"),
+        group2 = RSpec::Core::ExampleGroup.describe("Item 2"),
+        group3 = RSpec::Core::ExampleGroup.describe("Item 3"),
+      ]
+
+      Dir.mktmpdir do |dir|
+        path = "#{dir}/order"
+        Scrubber.record_rspec_run(config, path)
+        ordering_block.call(items)
+
+        expect(File.read(path)).to eq(<<-ORDER)
+#{group2} - Item 2 - ./spec/lib/scrubber_spec.rb
+#{group1} - Item 1 - ./spec/lib/scrubber_spec.rb
+#{group3} - Item 3 - ./spec/lib/scrubber_spec.rb
+        ORDER
+
+        ordering_block = nil
+        Scrubber.play_rspec_run(config, path)
+        expect(ordering_block.call(items)).
+          to eq([ group2, group1, group3 ])
+      end
+    end
   end
 
   describe Scrubber::List do

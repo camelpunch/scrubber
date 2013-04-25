@@ -1,23 +1,21 @@
-require 'fileutils'
 require_relative '../lib/scrubber'
 
 RSpec.configure do |config|
-  record = true # change to false to start finding pollution
-  filename = ENV['HOME'] + '/foo'
+  filename = ENV['HOME'] + '/order.txt'
+  Scrubber.record_rspec_run(config, filename)
 
-  FileUtils.rm_f(filename) if record
-
-  config.order_groups_and_examples do |items|
-    list = Scrubber::List.new(items)
-
-    if record
-      list.shuffle(324).tap do |list|
-        File.open(filename, 'a') { |f| f.puts list }
-      end
-    else
-      list.sort_by_other(File.read(filename))
-    end
-  end
+  # Run this file with rspec until you get a fail.
+  #
+  # Once you have a failed run, comment out the record line above, and
+  # uncomment the following line to play the fail back. It should always fail.
+  #
+  # Then, when you want to fix the pollution, edit ~/order.txt and swap the
+  # order of the polluter and the polluted examples.
+  #
+  # Run again, and you should have a green. You've successfully 'found' the
+  # test pollution culprits.
+  #
+  #Scrubber.play_rspec_run(config, filename)
 end
 
 describe "some pollution" do
