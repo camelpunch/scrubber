@@ -26,16 +26,16 @@ describe Scrubber do
         ordering_block.call(items[0..1])
 
         expect(File.read(path)).to eq(<<-ORDER)
-#{group2} - Item 2 - ./spec/lib/scrubber_spec.rb
-#{group1} - Item 1 - ./spec/lib/scrubber_spec.rb
+./spec/lib/scrubber_spec.rb - Item 2 - #{group2}
+./spec/lib/scrubber_spec.rb - Item 1 - #{group1}
         ORDER
 
         ordering_block.call([items[2]])
 
         expect(File.read(path)).to eq(<<-ORDER)
-#{group2} - Item 2 - ./spec/lib/scrubber_spec.rb
-#{group1} - Item 1 - ./spec/lib/scrubber_spec.rb
-#{group3} - Item 3 - ./spec/lib/scrubber_spec.rb
+./spec/lib/scrubber_spec.rb - Item 2 - #{group2}
+./spec/lib/scrubber_spec.rb - Item 1 - #{group1}
+./spec/lib/scrubber_spec.rb - Item 3 - #{group3}
         ORDER
       end
     end
@@ -69,9 +69,9 @@ describe Scrubber do
         ordering_block.call(items)
 
         expect(File.read(path)).to eq(<<-ORDER)
-#{group2} - Item 2 - ./spec/lib/scrubber_spec.rb
-#{group1} - Item 1 - ./spec/lib/scrubber_spec.rb
-#{group3} - Item 3 - ./spec/lib/scrubber_spec.rb
+./spec/lib/scrubber_spec.rb - Item 2 - #{group2}
+./spec/lib/scrubber_spec.rb - Item 1 - #{group1}
+./spec/lib/scrubber_spec.rb - Item 3 - #{group3}
         ORDER
 
         ordering_block = nil
@@ -169,10 +169,12 @@ describe Scrubber do
 
       lines = list.to_s.lines.to_a
 
-      expect(lines[0]).to eq("#{group1} - Group 1 - ./spec/lib/scrubber_spec.rb\n")
-      expect(lines[1]).to match(%r{#{group1_example1.class} - Group 1 an example - ./spec/lib/scrubber_spec.rb:\d+\n})
-      expect(lines[2]).to eq("#{group2} - Group 2 - ./spec/lib/scrubber_spec.rb\n")
-      expect(lines[3]).to eq("#{group2_subgroup1} - Subgroup - ./spec/lib/scrubber_spec.rb\n")
+      expect(lines[0]).to eq(
+        "./spec/lib/scrubber_spec.rb - Group 1 - #{group1}\n"
+      )
+      expect(lines[1]).to match(%r{./spec/lib/scrubber_spec.rb:\d+ - Group 1 an example - #{group1_example1.class}\n})
+      expect(lines[2]).to eq("./spec/lib/scrubber_spec.rb - Group 2 - #{group2}\n")
+      expect(lines[3]).to eq("./spec/lib/scrubber_spec.rb - Subgroup - #{group2_subgroup1}\n")
     end
   end
 end

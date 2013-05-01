@@ -59,9 +59,9 @@ module Scrubber
     def id_for(item)
       case item
       when RSpec::Core::Example
-        "#{item.class} - #{item.full_description} - #{item.location}"
+        [item.location, item.full_description, item.class].join(' - ')
       else
-        "#{item} - #{item.description} - #{item.file_path}"
+        [item.file_path, item.description, item].join(' - ')
       end
     end
   end
