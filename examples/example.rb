@@ -42,3 +42,12 @@ describe "some pollution" do
   end
 end
 
+describe "User" do
+  it "has a name"
+  it "validates presence of name"
+end
+
+describe "Order" do
+  it "has many items"
+  it "calculates its total from its items"
+end
