@@ -50,6 +50,8 @@ module Scrubber
         config = RSpecConfigDouble.new(seed: 324)
 
         in_temp_path do |path|
+          group1_subgroup1 = group1.describe('a subgroup')
+          group1_subgroup1_example1 = group1_subgroup1.example("some subgroup example")
           example1 = group1.example('an example')
           example2 = group1.example('g1 ex2')
 
@@ -57,6 +59,8 @@ module Scrubber
           config.run_ordering_block(group1)
           config.run_ordering_block(group2, group3)
           config.run_ordering_block(example2, example1)
+          config.run_ordering_block(group1_subgroup1)
+          config.run_ordering_block(group1_subgroup1_example1)
 
           config.run_after(:suite)
 
@@ -64,6 +68,8 @@ module Scrubber
             group1,
             example1,
             example2,
+            group1_subgroup1,
+            group1_subgroup1_example1,
 
             group3,
             group2,

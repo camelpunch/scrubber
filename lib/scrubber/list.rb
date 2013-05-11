@@ -35,7 +35,8 @@ module Scrubber
 
     def sort_by_other(list)
       list.to_s.each_line.inject(List.new) {|memo, stored_line|
-        memo << find {|item| stored_line.strip == id_for(item)}
+        found = find {|item| stored_line.strip == id_for(item)}
+        memo << found
       }.compact
     end
 

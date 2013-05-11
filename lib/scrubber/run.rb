@@ -9,8 +9,14 @@ class Run
     lists << list
   end
 
-  def groups
-    lists.flat_map(&:groups)
+  def top_level_groups
+    lists.flat_map(&:groups).
+      select {|group| group.superclass == RSpec::Core::ExampleGroup}
+  end
+
+  def subgroups_for(parent_group)
+    lists.flat_map(&:groups).
+      select {|group| group.superclass == parent_group}
   end
 
   def examples_for(group)
