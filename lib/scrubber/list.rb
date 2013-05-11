@@ -30,13 +30,12 @@ module Scrubber
 
     def shuffle(seed)
       generator = Random.new(seed || 1)
-      List.new(items.sort_by { generator.rand(@items.size) })
+      List.new(items.sort_by { generator.rand(items.size) })
     end
 
     def sort_by_other(list)
       list.to_s.each_line.inject(List.new) {|memo, stored_line|
-        found = find {|item| stored_line.strip == id_for(item)}
-        memo << found
+        memo << find {|item| stored_line.strip == id_for(item)}
       }.compact
     end
 
@@ -45,11 +44,7 @@ module Scrubber
     end
 
     def to_s
-      inject(StringIO.new) {|output, item|
-        output.tap do |output|
-          output.puts id_for(item)
-        end
-      }.string
+      inject('') {|output, item| [output, id_for(item), "\n"].join}
     end
 
     private
