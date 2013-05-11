@@ -34,7 +34,7 @@ module Scrubber
         file: file,
       }
       config.after(:suite) do
-        context[:run].top_level_groups.each do |group|
+        context[:run].groups.each do |group|
           context[:writer].call(group)
         end
         context[:file].close
@@ -48,7 +48,7 @@ module Scrubber
       run.examples_for(group).each do |example|
         file.puts Presenter.for(example)
       end
-      run.subgroups_for(group).each do |group|
+      run.groups(group).each do |group|
         write_group(group)
       end
     end
